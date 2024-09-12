@@ -1,14 +1,148 @@
 "use client";
-import React from "react";
-import { useSelector } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { GetAllCategories } from "@/services/categoryService";
+import { fetchUsersProducts } from "@/services/productService";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+// Define types for product
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  imageUrl: string;
+}
 
 function UserDashboard() {
-  const { users } = useSelector((state: any) => state.root);
-  console.log(users, "users");
+  const { userProductsList } = useSelector((state: any) => state.root.products);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
+  const dispatch: AppDispatch = useDispatch();
+  const GetAllCategory = useSelector((state: any) => state.root.categories);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+
+  const categories = GetAllCategory?.categories?.map((category: any) => ({
+    value: category._id,
+    label: category.name,
+  }));
+
+  useEffect(() => {
+    dispatch(GetAllCategories({ token: Token }));
+  }, [dispatch, Token]);
+
+  useEffect(() => {
+    dispatch(
+      fetchUsersProducts({
+        category: selectedCategory,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        token: Token,
+      })
+    );
+  }, [selectedCategory, minPrice, maxPrice, dispatch]);
+
   return (
-    <div className="p-4 m-2 bg-white shadow-md rounded-lg bg-blue-500 text-white mt-[14px]">
-      <h3 className="text-lg font-semibold text-gray-700">Total Products</h3>
-      <p className="text-2xl font-bold text-gray-900">{users?.totalUsers}</p>
+    <div className="flex flex-col min-h-screen h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-semibold mb-6">Products Dashboard</h1>
+
+      {/* Filters */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Category Filter */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">
+            Filter by Category
+          </label>
+          <select
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {categories?.map((category: any) => (
+              <option key={category?.value} value={category?.value}>
+                {category?.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Price Range Filter */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">
+            Filter by Price Range
+          </label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="number"
+              min="0"
+              className="w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => setMinPrice(Number(e.target.value))}
+            />
+            <input
+              type="number"
+              max="10000"
+              className="w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+            />
+          </div>
+
+          {/* Price Range Slider */}
+          <div className="mt-4">
+            <input
+              type="range"
+              min="0"
+              max="10000"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between">
+              <span>${minPrice}</span>
+              <span>${maxPrice === 10000 ? "10000+" : maxPrice}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Listing */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userProductsList?.products?.length > 0 ? (
+            userProductsList?.products?.map((product: any) => (
+              <div
+                key={product?._id}
+                className="bg-white p-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
+              >
+                <img
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${product?.image[0]}`}
+                  alt={product?.name}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {product?.name}
+                </h3>
+                <p className="text-gray-600">
+                  Category: {product?.category?.name}
+                </p>
+                <p className="text-gray-800 font-bold">${product?.price}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-center col-span-3 text-gray-600">
+              No products found.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

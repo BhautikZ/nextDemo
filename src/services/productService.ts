@@ -32,6 +32,31 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+// Thunk to fetch users with Filter
+export const fetchUsersProducts = createAsyncThunk(
+  "product/fetchUsersProducts",
+  async (
+    {
+      category,
+      minPrice,
+      maxPrice,
+      token,
+    }: { category: string; minPrice: number; maxPrice: number; token: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "GET",
+        url: `/product/userProducts?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
+        token,
+      });
+      console.log(response, "response");
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 export const addProducts = createAsyncThunk(
   "auth/addProduct",
   async (formData: FormData, { rejectWithValue, getState }) => {
