@@ -69,7 +69,7 @@ const Signup = () => {
     formData.append("gender", values.gender);
     formData.append("terms", values.terms.toString());
     formData.append("skills", JSON.stringify(skillValues));
-    formData.append("role", "admin");
+    // formData.append("role", "admin");
 
     values.images.forEach((image) => {
       formData.append("profile_image", image);

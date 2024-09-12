@@ -98,20 +98,46 @@ export const fetchUsers = createAsyncThunk(
       page,
       searchQuery,
       token,
-    }: { page: number; searchQuery: string; token: string },
+      sortcoloum,
+      sortorder,
+    }: {
+      page: number;
+      searchQuery: string;
+      token: string;
+      sortorder: string;
+      sortcoloum: string;
+    },
 
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
-        url: `/users/getall?page=${page}&search=${searchQuery}`,
+        url: `/users/getall?page=${page}&search=${searchQuery}&sortBy=${sortcoloum}&sortOrder=${sortorder}`,
         token,
       });
       console.log(response, "response");
       return response?.data?.data;
     } catch (error: any) {
       return rejectWithValue(error?.response?.data?.message);
+    }
+  }
+);
+
+export const GetProfile = createAsyncThunk(
+  "auth/getProfile",
+  async ({ id, token }: { id: string; token: string }, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "GET",
+        url: `/users/profile/${id}`,
+        contentType: "application/json",
+        token,
+      });
+      return response?.data?.data;
+    } catch (error: any) {
+      console.log(error?.response?.data?.message, "error");
+      toast.error(error?.response?.data?.message);
     }
   }
 );

@@ -22,6 +22,12 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const dispatch: AppDispatch = useDispatch();
   const UserData = useSelector((state: any) => state.root.signIn.loginData);
+  const SocialUserData = useSelector(
+    (state: any) => state.root.signIn.socialLoginUserData
+  );
+
+  const Role = UserData?.user?.role || SocialUserData?.user?.role;
+  console.log(Role, "role");
   const router = useRouter();
 
   const handleSignOut = () => {
@@ -33,12 +39,13 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       dispatch(resetCategoryData());
       signOut({ callbackUrl: "/auth/loginPage" });
     } else {
+      Role === "admin"
+        ? router.push("/auth/admin/loginPage")
+        : router.push("/auth/loginPage");
       dispatch(logout());
       dispatch(resetData());
       dispatch(resetProductData());
       dispatch(resetCategoryData());
-
-      router.push("/auth/loginPage");
     }
   };
 
@@ -71,39 +78,53 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
           >
             <img src={dashboardIcon.src} alt="" />
           </h1>
-          <nav className="mt-6">
-            <ul>
-              <li>
-                <Link href="/dashboard" className={getLinkClass("/dashboard")}>
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="/users" className={getLinkClass("/users")}>
-                  Users
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/categories"
-                  className={getLinkClass("/categories")}
-                >
-                  Categories
-                </Link>
-              </li>
-              <li>
-                <Link href="/products" className={getLinkClass("/products")}>
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile" className={getLinkClass("/profile")}>
-                  Profile
-                </Link>
-              </li>
-              {/* Add more sidebar links here */}
-            </ul>
-          </nav>
+
+          {Role === "admin" ? (
+            <nav className="mt-6">
+              <ul>
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className={getLinkClass("/dashboard")}
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/users" className={getLinkClass("/users")}>
+                    Users
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/categories"
+                    className={getLinkClass("/categories")}
+                  >
+                    Categories
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/products" className={getLinkClass("/products")}>
+                    Products
+                  </Link>
+                </li>
+                {/* Add more sidebar links here */}
+              </ul>
+            </nav>
+          ) : (
+            <nav className="mt-6">
+              <ul>
+                <li>
+                  <Link
+                    href="/userDashboard"
+                    className={getLinkClass("/userDashboard")}
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          )}
         </div>
       </aside>
 
@@ -125,12 +146,30 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
                   alt="User Image"
                   className="w-8 h-8 rounded-full mr-2"
                 />
-                <span className="text-gray-800 font-medium">
-                  {session ? session.user?.name : UserData?.user?.name}
-                </span>
+                <div className="flex flex-col text-gray-800">
+                  {/* Display the user's name */}
+                  <span className="font-medium">
+                    {session ? session.user?.name : UserData?.user?.name}
+                  </span>
+                  {/* Display the role under the name */}
+                  <span className="text-sm text-gray-500">
+                    {Role
+                      ? Role.charAt(0).toUpperCase() + Role.slice(1)
+                      : "Guest"}
+                  </span>
+                </div>
               </div>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
+                  <button
+                    onClick={() => {
+                      router.push("/profile");
+                      setDropdownOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Profile
+                  </button>
                   <button
                     onClick={handleSignOut}
                     className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"

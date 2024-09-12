@@ -3,26 +3,14 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useSession, signIn, signOut } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginUser, SocialLoginUser } from "@/services/authService";
+import { LoginUser } from "@/services/authService";
 import { AppDispatch } from "@/redux/store";
-import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
-import Link from "next/link";
-import {
-  FaApple,
-  FaFacebook,
-  FaGithub,
-  FaGoogle,
-  FaLinkedin,
-  FaTwitter,
-} from "react-icons/fa";
+
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 import Spinner from "@/components/Spinner";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import CustomInput from "@/components/CustomeInput";
 import PasswordInput from "@/components/CustomePasswordInput";
 
@@ -43,14 +31,12 @@ const schema = yup.object().shape({
 
 function Login() {
   const dispatch: AppDispatch = useDispatch();
-  const { loading } = useSelector((state: any) => state.root.signIn);
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [showPassword, setShowPassword] = useState(false);
+  const { loading, loginData, socialLoginUserData } = useSelector(
+    (state: any) => state.root.signIn
+  );
+  const Role = loginData?.user?.role || socialLoginUserData?.user?.role;
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const router = useRouter();
 
   // Form setup with react-hook-form and Yup validation
   const {
@@ -61,23 +47,11 @@ function Login() {
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {
-    if (session) {
-      const data: any = {
-        email: session.user?.email,
-      };
-
-      dispatch(SocialLoginUser(data));
-      localStorage.setItem("userSession", JSON.stringify(session));
-      router.push("/userDashboard");
-    }
-  }, [session]);
-
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
       const response = await dispatch(LoginUser(data));
       if (LoginUser.rejected.match(response)) {
-        router.push("/auth/loginPage");
+        router.push("/auth/admin/loginPage");
       } else if (LoginUser.fulfilled.match(response)) {
         const userRole = response.payload?.user?.role;
         console.log(userRole, "userRole");
@@ -95,7 +69,7 @@ function Login() {
     <div>
       <div className="w-full h-screen flex flex-col justify-center items-center bg-gray-100">
         <h1 className="text-4xl font-bold text-indigo-600 mb-6 animate-fade-in">
-          Welcome to my Next Website
+          Welcome to Admin Sign In Page
         </h1>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -134,60 +108,7 @@ function Login() {
               {loading ? <Spinner /> : "Sign in"}
             </button>
           </div>
-          <Link href="/auth/forgotPassword" className="text-sm text-right">
-            <p className="text-blue-600 font-semibold hover:underline">
-              Forgot Password?
-            </p>
-          </Link>
-          <br />
-          <Link href="/auth/signupPage">
-            <p className="text-sm mt-1 text-center text-gray-700">
-              Don't Have an Account?{" "}
-              <span className="text-blue-600 font-semibold hover:underline">
-                Sign Up
-              </span>
-            </p>
-          </Link>
         </form>
-        <p className="text-2xl mb-2">Or sign in with</p>
-        <div className="flex space-x-4">
-          <button
-            className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition duration-200"
-            onClick={() => signIn("github")}
-          >
-            <FaGithub size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("google")}
-          >
-            <FaGoogle size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("twitter")}
-          >
-            <FaTwitter size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("facebook")}
-          >
-            <FaFacebook size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("linkedin")}
-          >
-            <FaLinkedin size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("apple")}
-          >
-            <FaApple size={24} />
-          </button>
-        </div>
       </div>
     </div>
   );

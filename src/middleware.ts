@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 const protectedRoutes = [
   "/dashboard",
+  "/userDashboard",
   "/profile",
   "/users",
   "/products",

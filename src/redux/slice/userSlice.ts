@@ -9,6 +9,7 @@ interface UserState {
   error?: string;
   totalPages: number;
   currentPage: number;
+  totalUsers: number;
 }
 
 const initialState: UserState = {
@@ -17,6 +18,7 @@ const initialState: UserState = {
   error: undefined,
   totalPages: 1,
   currentPage: 1,
+  totalUsers: 0,
 };
 
 const userSlice = createSlice({
@@ -31,6 +33,7 @@ const userSlice = createSlice({
       state.loading = false;
       state.totalPages = 1;
       state.currentPage = 1;
+      state.totalUsers = 0;
     },
   },
   extraReducers: (builder) => {
@@ -42,6 +45,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.users = action.payload?.users || [];
         state.totalPages = action.payload?.totalPages || 1;
+        state.totalUsers = action.payload?.totalUsers;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

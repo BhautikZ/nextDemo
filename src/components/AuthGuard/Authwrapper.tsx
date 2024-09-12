@@ -1,10 +1,8 @@
 "use client";
-import { ComponentType, useEffect } from "react";
-//import { routes } from "@/routes";
-//import Loadercomponent from "@/components/common/Loadercomponent";
+import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { useSession } from "next-auth/react";
 import PageLoader from "../Pageloader";
 
 //auth props
@@ -17,7 +15,6 @@ const withAuth = (WrappedComponent: any) => {
   // This function will be part of the component's return, ensuring it only runs client-side.
   const verifyToken = () => {
     const UserData = useSelector((state: any) => state.root.signIn.loginData);
-    const { data: session } = useSession();
     const token = typeof window !== "undefined" ? UserData?.token : null;
 
     console.log(sessionData, userSession, "sessionData");

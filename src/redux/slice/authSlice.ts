@@ -1,10 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { LoginUser, signInUser, SocialLoginUser } from "@/services/authService";
+import {
+  GetProfile,
+  LoginUser,
+  signInUser,
+  SocialLoginUser,
+} from "@/services/authService";
 import toast from "react-hot-toast";
 
 interface AuthState {
   socialLoginUserData: object;
   user: object;
+  profileData: object;
   loginData: object;
   loading: boolean;
   error?: string;
@@ -13,6 +19,7 @@ interface AuthState {
 const initialState: AuthState = {
   loginData: {},
   user: {},
+  profileData: {},
   socialLoginUserData: {},
   loading: false,
 };
@@ -25,6 +32,7 @@ const authSlice = createSlice({
       state.socialLoginUserData = {};
       state.user = {};
       state.loginData = {};
+      state.profileData = {};
       localStorage.removeItem("userSession");
     },
   },
@@ -80,6 +88,16 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
         toast.error(state.error || "An error occurred");
+      })
+      .addCase(GetProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(GetProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profileData = action.payload;
+      })
+      .addCase(GetProfile.rejected, (state, action) => {
+        state.loading = false;
       });
   },
 });
