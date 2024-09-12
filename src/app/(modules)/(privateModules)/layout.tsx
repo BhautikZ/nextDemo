@@ -27,7 +27,6 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
   );
 
   const Role = UserData?.user?.role || SocialUserData?.user?.role;
-  console.log(Role, "role");
   const router = useRouter();
 
   const handleSignOut = () => {
