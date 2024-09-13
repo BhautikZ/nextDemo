@@ -15,13 +15,21 @@ export const fetchProducts = createAsyncThunk(
       page,
       searchQuery,
       token,
-    }: { page: number; searchQuery: string; token: string },
+      sortorder,
+      sortcoloum,
+    }: {
+      page: number;
+      searchQuery: string;
+      token: string;
+      sortorder: string;
+      sortcoloum: string;
+    },
     { rejectWithValue }
   ) => {
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
-        url: `/product/products?page=${page}&search=${searchQuery}`,
+        url: `/product/products?page=${page}&search=${searchQuery}&sortBy=${sortcoloum}&sortOrder=${sortorder}`,
         token,
       });
       console.log(response, "response");
@@ -47,7 +55,7 @@ export const fetchUsersProducts = createAsyncThunk(
     try {
       const response = await AxiosDefaultSetting({
         method: "GET",
-        url: `/product/userProducts?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
+        url: `/product/userProducts?categories=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
         token,
       });
       console.log(response, "response");

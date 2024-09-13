@@ -13,11 +13,14 @@ import {
 } from "@/services/categoryService";
 import { setCurrentPage } from "@/redux/slice/categorySlice";
 import Modal from "@/components/Modal";
+import { CommonTable } from "@/components/CustomeTable";
 
 const Categories = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [sortorder, setSortOrder] = useState("asc");
+  const [sortcoloum, setsortColoum] = useState("name");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { singleCategory } = useSelector((state: any) => state.root.categories);
 
@@ -51,10 +54,12 @@ const Categories = () => {
           page: currentPage,
           searchQuery: debouncedSearchQuery,
           token: Token,
+          sortorder: sortorder,
+          sortcoloum: sortcoloum,
         })
       );
     }
-  }, [currentPage, debouncedSearchQuery, dispatch]);
+  }, [currentPage, debouncedSearchQuery, sortcoloum, sortorder, dispatch]);
 
   const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
@@ -86,6 +91,8 @@ const Categories = () => {
               page: 1,
               searchQuery: debouncedSearchQuery,
               token: Token,
+              sortorder: sortorder,
+              sortcoloum: sortcoloum,
             })
           );
         } else {
@@ -105,6 +112,24 @@ const Categories = () => {
     }
   };
 
+  //handel sort
+  const handleSort = (columnKey: string) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortcoloum && sortcoloum === columnKey && sortorder === "asc") {
+      direction = "desc";
+      setSortOrder("desc");
+    } else {
+      setSortOrder("asc");
+    }
+    setsortColoum(columnKey);
+  };
+  //coloum of table
+  const columns = [
+    { key: "name", label: "Name", type: "text" },
+    { key: "description", label: "Description", type: "text" },
+    { key: "isActive", label: "Status", type: "text" },
+  ];
+
   const handleViewCategory = async (id: string) => {
     await dispatch(getSingleCategory({ id, token: Token }));
 
@@ -112,126 +137,35 @@ const Categories = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 rounded-lg shadow-lg mt-[14px]">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-800">All Categories</h1>
-        <div className="flex space-x-4 items-center">
-          <button
-            onClick={() => router.push("/categories/addCategory")}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
-          >
-            + Add Category
-          </button>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table className="min-w-full bg-white rounded-lg overflow-hidden shadow">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Category Name
-              </th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Description
-              </th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Status
-              </th>
-              <th className="py-4 px-6 text-left font-semibold text-gray-600">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories?.map((category: any) => {
-              return (
-                <tr key={category?.id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    {category?.name}
-                  </td>
-                  <td className="py-4 px-6  border-gray-200 text-gray-800">
-                    {category?.description}
-                  </td>
-                  <td
-                    className={`py-4 px-6 border-gray-200 font-semibold ${
-                      category?.isActive ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {category?.isActive ? "Active" : "InActive"}
-                  </td>
-                  <td className="py-4 px-6 border-gray-200 flex space-x-4">
-                    <button
-                      className="text-blue-500 hover:text-blue-700"
-                      onClick={() => handleViewCategory(category?._id)}
-                    >
-                      <FaEye size={20} />
-                    </button>
-                    <button
-                      className="text-green-500 hover:text-green-700"
-                      onClick={() =>
-                        router.push(`/categories/editCategory/${category?._id}`)
-                      }
-                    >
-                      <FaEdit size={20} />
-                    </button>
-
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => deletePopUp(category?._id)}
-                    >
-                      <FaTrash size={20} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
-
+    <div>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         data={singleCategory}
       />
 
-      <div className="mt-6 flex justify-between items-center">
-        <button
-          onClick={() => dispatch(setCurrentPage(currentPage - 1))}
-          className={`px-4 py-2 rounded ${
-            currentPage === 1
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span className="text-gray-700">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => dispatch(setCurrentPage(currentPage + 1))}
-          className={`px-4 py-2 rounded ${
-            currentPage === totalPages
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+      <CommonTable
+        columns={columns}
+        tableData={categories}
+        loading={loading}
+        error={null}
+        onDelete={deletePopUp}
+        onSort={handleSort} // Pass the sorting handler
+        sortcoloum={sortcoloum} // Pass the sorting config
+        sortorder={sortorder}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => dispatch(setCurrentPage(page))}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onView={true}
+        onEdit={true}
+        viewHandler={handleViewCategory}
+        label="All Categories"
+        addButton="Add Category"
+        addButtonRoute={() => router.push("/categories/addCategory")}
+        editButtonRoute="/categories/editCategory"
+      />
     </div>
   );
 };

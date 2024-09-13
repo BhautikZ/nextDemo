@@ -4,6 +4,7 @@ import { GetAllCategories } from "@/services/categoryService";
 import { fetchUsersProducts } from "@/services/productService";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
 
 // Define types for product
 interface Product {
@@ -16,7 +17,8 @@ interface Product {
 
 function UserDashboard() {
   const { userProductsList } = useSelector((state: any) => state.root.products);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(10000);
   const dispatch: AppDispatch = useDispatch();
@@ -36,15 +38,22 @@ function UserDashboard() {
   }, [dispatch, Token]);
 
   useEffect(() => {
+    const categoriesString = selectedCategories
+      .map((cat) => cat.value)
+      .join(",");
     dispatch(
       fetchUsersProducts({
-        category: selectedCategory,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
+        category: categoriesString,
+        minPrice,
+        maxPrice,
         token: Token,
       })
     );
-  }, [selectedCategory, minPrice, maxPrice, dispatch]);
+  }, [selectedCategories, minPrice, maxPrice, dispatch, Token]);
+
+  const handleCategoryChange = (selectedOptions: any) => {
+    setSelectedCategories(selectedOptions || []);
+  };
 
   return (
     <div className="flex flex-col min-h-screen h-screen bg-gray-100 p-6">
@@ -57,18 +66,15 @@ function UserDashboard() {
           <label className="block text-gray-700 font-medium mb-2">
             Filter by Category
           </label>
-          <select
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {categories?.map((category: any) => (
-              <option key={category?.value} value={category?.value}>
-                {category?.label}
-              </option>
-            ))}
-          </select>
+          <Select
+            isMulti
+            value={selectedCategories}
+            onChange={handleCategoryChange}
+            options={categories}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            placeholder="Select categories"
+          />
         </div>
 
         {/* Price Range Filter */}
