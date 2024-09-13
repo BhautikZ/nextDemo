@@ -67,7 +67,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       <aside
         className={`transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "w-64" : "w-20"
-        } bg-gradient-to-r from-gray-800 to-gray-600 text-white h-full overflow-hidden`}
+        } bg-gradient-to-r from-gray-800 to-gray-600 text-white h-full overflow-y-auto`}
       >
         <div className="p-4 m-[25px]">
           <h1
@@ -128,7 +128,7 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 bg-gray-100">
+      <main className="flex-1 p-6 bg-gray-100 h-full overflow-y-auto">
         <div className="flex justify-end items-center">
           {
             <div className="relative">
@@ -186,4 +186,4 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default withAuth(DefaultLayout);
+export default withAuth(DefaultLayout, ["admin"]);

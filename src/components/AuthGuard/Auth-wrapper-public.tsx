@@ -37,7 +37,7 @@ const withAuthPublic = (WrappedComponent: any) => {
         if (role === "admin") {
           router.replace("/users"); // Redirect admins to /users
         } else {
-          router.replace("/userDashboard"); // Redirect other users to /dashboard
+          router.replace("/home"); // Redirect other users to /dashboard
         }
       }
     }, [isAuthenticated, role, router]);

@@ -35,12 +35,20 @@ export const productValidationSchema = Yup.object({
       Yup.mixed()
         .required("Image is required")
         .test("fileSize", "File size is too large", (value) => {
+          // Skip size check for existing images (strings)
+          if (typeof value === "string") return true;
+
+          // Check file size for new images (Files)
           if (value && value instanceof File) {
             return value.size <= 5 * 1024 * 1024; // 5MB
           }
           return false;
         })
         .test("fileFormat", "Unsupported file format", (value) => {
+          // Skip format check for existing images (strings)
+          if (typeof value === "string") return true;
+
+          // Check file format for new images (Files)
           if (value && value instanceof File) {
             return ["image/jpeg", "image/png", "image/jpg"].includes(
               value.type
@@ -49,6 +57,15 @@ export const productValidationSchema = Yup.object({
           return false;
         })
     )
-    .min(1, "Image is required")
+    .test(
+      "minImages",
+      "At least one valid image is required",
+      (imagesArray) => {
+        console.log(imagesArray, "image");
+        if (typeof imagesArray === "string") return true;
+        // Ensure that there's at least one valid image (either a string or File)
+        return imagesArray && imagesArray.length > 0;
+      }
+    )
     .required("Images are required"),
 });

@@ -59,8 +59,8 @@ const EditProduct = () => {
         category: singleProduct?.product?.category
           ? singleProduct?.product?.category?._id
           : "",
-        stock: singleProduct.product.stock.toString() || "",
-        images: [],
+        stock: singleProduct?.product?.stock?.toString() || "",
+        images: singleProduct?.product?.image,
       });
 
       // Set previews for existing images
