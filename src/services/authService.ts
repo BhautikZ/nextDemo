@@ -2,6 +2,11 @@ import AxiosDefaultSetting from "@/AxiosSetting";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
+interface EditProfilePayload {
+  userID: string;
+  formData: FormData;
+}
+
 export const signInUser = createAsyncThunk(
   "auth/signInUser",
   async (formData: FormData, { rejectWithValue }) => {
@@ -11,6 +16,29 @@ export const signInUser = createAsyncThunk(
         data: formData,
         url: "/users/register",
         contentType: "multipart/form-data", // Ensure content type is set for FormData
+      });
+      return response.data;
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
+);
+
+export const editProfile = createAsyncThunk(
+  "auth/signInUser",
+  async (payload: EditProfilePayload, { rejectWithValue, getState }) => {
+    const state = getState() as any;
+    const User = state.root.signIn;
+    const SocialUserToken = User?.socialLoginUserData?.token;
+    const UserToken = User?.loginData?.token;
+    const token: string = SocialUserToken || UserToken;
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "PUT",
+        data: payload.formData,
+        url: `/users/updateusers/${payload.userID}`,
+        contentType: "multipart/form-data", // Ensure content type is set for FormData
+        token,
       });
       return response.data;
     } catch (error: any) {

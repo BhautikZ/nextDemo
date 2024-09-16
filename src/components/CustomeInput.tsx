@@ -3,9 +3,11 @@ import React from "react";
 
 const CustomInput = ({ id, label, register, error, ...rest }: any) => {
   return (
-    <>
+    <div>
       <div className="relative ">
-        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+        </label>
         <input
           type="text"
           id={id}
@@ -15,7 +17,7 @@ const CustomInput = ({ id, label, register, error, ...rest }: any) => {
         />
         {error && <p className="text-red-500 text-xs pt-2">{error?.message}</p>}
       </div>
-    </>
+    </div>
   );
 };
 
