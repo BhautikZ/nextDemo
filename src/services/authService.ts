@@ -159,3 +159,18 @@ export const deleteUserHandler = createAsyncThunk(
     }
   }
 );
+
+export const capturePayment = createAsyncThunk(
+  "auth/confirmpayment",
+  async (data: string, { rejectWithValue }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "GET",
+        url: `/payment/getpaymentdetails/${data}`,
+      });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);

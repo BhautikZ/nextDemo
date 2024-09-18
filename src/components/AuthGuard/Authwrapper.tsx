@@ -39,7 +39,7 @@ const withAuth = (WrappedComponent: any, allowedRoles: string[]) => {
     const userRole = role || sessionData?.role;
 
     // Check if the user's role is allowed to access this component
-    return allowedRoles.includes(userRole);
+    return allowedRoles?.includes(userRole);
   };
 
   return (props: any) => {
