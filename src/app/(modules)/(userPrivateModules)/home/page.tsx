@@ -1,6 +1,50 @@
-import React from "react";
+"use client";
+import { AppDispatch } from "@/redux/store";
+import { GetAllCategories } from "@/services/categoryService";
+import { fetchUsersProducts } from "@/services/productService";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const LandingPage = () => {
+  const { userProductsList } = useSelector((state: any) => state.root.products);
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
+  const dispatch: AppDispatch = useDispatch();
+  const GetAllCategory = useSelector((state: any) => state.root.categories);
+  const User = useSelector((state: any) => state.root.signIn);
+  const SocialUserToken = User?.socialLoginUserData?.token;
+  const UserToken = User?.loginData?.token;
+  const Token = SocialUserToken || UserToken;
+
+  const categories = GetAllCategory?.categories?.map((category: any) => ({
+    value: category._id,
+    label: category.name,
+  }));
+
+  useEffect(() => {
+    dispatch(GetAllCategories({ token: Token }));
+  }, [dispatch, Token]);
+
+  useEffect(() => {
+    const categoriesString = selectedCategories
+      .map((cat: any) => cat.value)
+      .join(",");
+    dispatch(
+      fetchUsersProducts({
+        category: categoriesString,
+        minPrice,
+        maxPrice,
+        token: Token,
+      })
+    );
+  }, [selectedCategories, minPrice, maxPrice, dispatch, Token]);
+
+  const handleCategoryChange = (selectedOptions: any) => {
+    setSelectedCategories(selectedOptions || []);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -23,30 +67,16 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-8">Shop by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Category 1"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Category 1</h3>
-            </div>
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Category 2"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Category 2</h3>
-            </div>
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Category 3"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Category 3</h3>
-            </div>
+            {GetAllCategory?.categories?.map((cat: any) => {
+              return (
+                <div
+                  className="bg-white p-6 shadow-lg rounded-lg"
+                  key={cat._id}
+                >
+                  <h3 className="text-xl font-semibold">{cat?.name}</h3>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -56,42 +86,36 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-8">Best Selling Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 1"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Product 1</h3>
-              <p className="text-blue-600 font-semibold">$50</p>
-              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-                Add to Cart
-              </button>
-            </div>
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 2"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Product 2</h3>
-              <p className="text-blue-600 font-semibold">$70</p>
-              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-                Add to Cart
-              </button>
-            </div>
-            <div className="bg-white p-6 shadow-lg rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 3"
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold">Product 3</h3>
-              <p className="text-blue-600 font-semibold">$30</p>
-              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-                Add to Cart
-              </button>
-            </div>
+            {userProductsList?.products?.length > 0 ? (
+              userProductsList?.products?.map((product: any) => (
+                <div
+                  className="bg-white p-6 shadow-lg rounded-lg flex flex-col items-center justify-between"
+                  key={product?._id}
+                >
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BASE_URL}${product?.image[0]}`}
+                    alt={product?.name}
+                    className="mb-4 w-full h-40 object-cover rounded-md"
+                  />
+                  <h3 className="text-xl font-semibold text-center">
+                    {product?.name}
+                  </h3>
+                  <p className="text-gray-600">
+                    Category: {product?.category?.name}
+                  </p>
+                  <p className="text-blue-600 font-semibold">
+                    ${product?.price}
+                  </p>
+                  <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Add to Cart
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-center col-span-3 text-gray-600">
+                No products found.
+              </p>
+            )}
           </div>
         </div>
       </section>
