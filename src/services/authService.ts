@@ -196,7 +196,7 @@ export const capturePayment = createAsyncThunk(
         method: "GET",
         url: `/payment/getpaymentdetails/${data}`,
       });
-      return response.data.data;
+      return toast.success(response?.data?.message);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }

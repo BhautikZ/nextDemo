@@ -147,3 +147,20 @@ export const deleteProductHandler = createAsyncThunk(
     }
   }
 );
+
+//create payment order api
+export const createPayment = createAsyncThunk(
+  "product/payments",
+  async ({ data }: { data: string }) => {
+    try {
+      const response = await AxiosDefaultSetting({
+        method: "GET",
+        url: `/payment/createpayment`,
+        contentType: "application/json",
+      });
+      return response.data;
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
+);

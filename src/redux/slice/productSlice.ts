@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  createPayment,
   fetchProducts,
   fetchUsersProducts,
   getSingleProduct,
@@ -12,6 +13,7 @@ interface ProductsState {
   loading: boolean;
   totalPages: number;
   currentPage: number;
+  paymentlink: any;
 }
 
 const initialState: ProductsState = {
@@ -21,6 +23,7 @@ const initialState: ProductsState = {
   loading: false,
   totalPages: 1,
   currentPage: 1,
+  paymentlink: [],
 };
 
 const productSlice = createSlice({
@@ -70,6 +73,17 @@ const productSlice = createSlice({
         state.userProductsList = action.payload;
       })
       .addCase(fetchUsersProducts.rejected, (state) => {
+        state.loading = false;
+      })
+      //payment api
+      .addCase(createPayment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createPayment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.paymentlink = action.payload;
+      })
+      .addCase(createPayment.rejected, (state) => {
         state.loading = false;
       });
   },

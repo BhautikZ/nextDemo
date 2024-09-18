@@ -1,8 +1,11 @@
 "use client";
+import { createPayment } from "@/services/productService";
 // pages/checkout.js
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const Checkout = () => {
+  const dispatch = useDispatch();
   const [cart, setCart] = useState([
     {
       id: 1,
@@ -20,6 +23,13 @@ const Checkout = () => {
     },
   ]);
 
+  const proccedPayment = async () => {
+    const data = "";
+    const res: any = await dispatch(createPayment(data));
+    console.log(res);
+    window.open(res?.payload?.data, "_blank");
+  };
+
   const handleQuantityChange = (id: any, value: any) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
@@ -31,7 +41,6 @@ const Checkout = () => {
   const calculateTotal = () => {
     return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Checkout Header */}
@@ -83,7 +92,10 @@ const Checkout = () => {
             <h3 className="text-2xl font-bold">
               Order Total: ${calculateTotal()}
             </h3>
-            <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+            <button
+              onClick={proccedPayment}
+              className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
               Proceed to Payment
             </button>
           </div>
