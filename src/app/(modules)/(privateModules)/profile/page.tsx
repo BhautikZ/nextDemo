@@ -27,8 +27,6 @@ function Profile() {
   const Token = UserData?.token || SocialUserData?.token;
   const Role = UserData?.user?.role || SocialUserData?.user?.role;
 
-  console.log(ProfileData, "1234");
-
   const router = useRouter();
 
   useEffect(() => {

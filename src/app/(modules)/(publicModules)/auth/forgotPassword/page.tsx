@@ -49,7 +49,10 @@ function ForgotPassword() {
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
       >
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input

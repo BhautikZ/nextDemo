@@ -37,7 +37,7 @@ const EditCategory = () => {
       setInitialValues({
         name: singleCategory?.name || "",
         description: singleCategory?.description || "",
-        isActive: singleCategory?.isActive ? "true" : "false", // Convert boolean to string
+        isActive: singleCategory?.isActive ? "true" : "false",
       });
     }
   }, [singleCategory]);
@@ -45,7 +45,7 @@ const EditCategory = () => {
   const [initialValues, setInitialValues] = useState<CategoryFormValues>({
     name: "",
     description: "",
-    isActive: "true", // Default value if no data is available
+    isActive: "true",
   });
 
   const onSubmit = async (
@@ -55,7 +55,7 @@ const EditCategory = () => {
     const formData = {
       name: values.name,
       description: values.description,
-      isActive: values.isActive === "true", // Convert back to boolean
+      isActive: values.isActive === "true",
     };
 
     try {

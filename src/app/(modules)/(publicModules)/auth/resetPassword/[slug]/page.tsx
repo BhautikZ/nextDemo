@@ -5,7 +5,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { ResetPasswordHandler } from "@/services/authService";
@@ -24,7 +23,7 @@ const schema = yup.object().shape({
 function ResetPassword({ params }: { params: { slug: string } }) {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
-  const { slug } = params; // Retrieve the dynamic token from the URL
+  const { slug } = params;
 
   console.log(slug, "token");
 
@@ -39,7 +38,6 @@ function ResetPassword({ params }: { params: { slug: string } }) {
   const onSubmit = async (data: { password: string }) => {
     try {
       await dispatch(ResetPasswordHandler({ slug, data }));
-      // router.push("/auth/loginPage");
     } catch (error) {
       toast.error("Something went wrong, please try again");
     }
@@ -55,7 +53,10 @@ function ResetPassword({ params }: { params: { slug: string } }) {
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
       >
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
             New Password
           </label>
           <input

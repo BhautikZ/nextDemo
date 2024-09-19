@@ -1,30 +1,25 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
 import defaultImage from "../../../../../public/assets/images.png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { deleteUserHandler, fetchUsers } from "@/services/authService";
 import { setCurrentPage } from "@/redux/slice/userSlice";
 import useDebounce from "@/hooks/useDebounce";
-import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import { CommonTable } from "@/components/CustomeTable";
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [sortorder, setSortOrder] = useState("asc");
-  const [sortcoloum, setsortColoum] = useState("name");
-  const { data: session } = useSession();
-  const UserData = useSelector((state: any) => state.root.signIn.loginData);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortColumn, setSortColumn] = useState("name");
   const User = useSelector((state: any) => state.root.signIn);
   const SocialUserToken = User?.socialLoginUserData?.token;
   const UserToken = User?.loginData?.token;
   const Token = SocialUserToken || UserToken;
-  console.log(Token, "UserToken");
   const dispatch: AppDispatch = useDispatch();
-  const { users, totalPages, currentPage, loading, error } = useSelector(
+  const { users, totalPages, currentPage, loading } = useSelector(
     (state: any) => state.root.users
   );
 
@@ -41,8 +36,8 @@ const Users = () => {
           page: currentPage,
           searchQuery: debouncedSearchQuery,
           token: Token,
-          sortorder: sortorder,
-          sortcoloum: sortcoloum,
+          sortorder: sortOrder,
+          sortcoloum: sortColumn,
         })
       );
     }
@@ -51,8 +46,8 @@ const Users = () => {
     debouncedSearchQuery,
     dispatch,
     Token,
-    sortcoloum,
-    sortorder,
+    sortColumn,
+    sortOrder,
   ]);
 
   const deletePopUp = async (id: string) => {
@@ -88,8 +83,8 @@ const Users = () => {
               page: 1,
               searchQuery: debouncedSearchQuery,
               token: Token,
-              sortorder: sortorder,
-              sortcoloum: sortcoloum,
+              sortorder: sortOrder,
+              sortcoloum: sortColumn,
             })
           );
         } else {
@@ -110,14 +105,12 @@ const Users = () => {
   };
   //handel sort
   const handleSort = (columnKey: string) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortcoloum && sortcoloum === columnKey && sortorder === "asc") {
-      direction = "desc";
+    if (sortColumn && sortColumn === columnKey && sortOrder === "asc") {
       setSortOrder("desc");
     } else {
       setSortOrder("asc");
     }
-    setsortColoum(columnKey);
+    setSortColumn(columnKey);
   };
   //coloum of table
   const columns = [
@@ -134,9 +127,9 @@ const Users = () => {
       loading={loading}
       error={null}
       onDelete={deletePopUp}
-      onSort={handleSort} // Pass the sorting handler
-      sortcoloum={sortcoloum} // Pass the sorting config
-      sortorder={sortorder}
+      onSort={handleSort}
+      sortcoloum={sortColumn}
+      sortorder={sortOrder}
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={(page) => dispatch(setCurrentPage(page))}

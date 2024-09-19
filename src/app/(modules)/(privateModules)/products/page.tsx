@@ -17,10 +17,9 @@ import { CommonTable } from "@/components/CustomeTable";
 const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
-  // const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [sortorder, setSortOrder] = useState("asc");
-  const [sortcoloum, setsortColoum] = useState("name");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortColumn, setSortColumn] = useState("name");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { singleProduct } = useSelector((state: any) => state.root.products);
   const User = useSelector((state: any) => state.root.signIn);
@@ -35,8 +34,6 @@ const Products = () => {
   );
   const { currentPage } = useSelector((state: any) => state.root.products);
 
-  console.log(products, totalPages, currentPage, loading, "products");
-
   useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
       dispatch(setCurrentPage(1));
@@ -49,11 +46,11 @@ const Products = () => {
         page: currentPage,
         searchQuery: debouncedSearchQuery,
         token: Token,
-        sortorder: sortorder,
-        sortcoloum: sortcoloum,
+        sortorder: sortOrder,
+        sortcoloum: sortColumn,
       })
     );
-  }, [currentPage, debouncedSearchQuery, sortcoloum, sortorder, dispatch]);
+  }, [currentPage, debouncedSearchQuery, sortColumn, sortOrder, dispatch]);
 
   const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
@@ -85,8 +82,8 @@ const Products = () => {
               page: 1,
               searchQuery: debouncedSearchQuery,
               token: Token,
-              sortorder: sortorder,
-              sortcoloum: sortcoloum,
+              sortorder: sortOrder,
+              sortcoloum: sortColumn,
             })
           );
         } else {
@@ -108,14 +105,12 @@ const Products = () => {
 
   //handel sort
   const handleSort = (columnKey: string) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortcoloum && sortcoloum === columnKey && sortorder === "asc") {
-      direction = "desc";
+    if (sortColumn && sortColumn === columnKey && sortOrder === "asc") {
       setSortOrder("desc");
     } else {
       setSortOrder("asc");
     }
-    setsortColoum(columnKey);
+    setSortColumn(columnKey);
   };
   //coloum of table
   const columns = [
@@ -152,9 +147,9 @@ const Products = () => {
         loading={loading}
         error={null}
         onDelete={deletePopUp}
-        onSort={handleSort} // Pass the sorting handler
-        sortcoloum={sortcoloum} // Pass the sorting config
-        sortorder={sortorder}
+        onSort={handleSort}
+        sortcoloum={sortColumn}
+        sortorder={sortOrder}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={(page) => dispatch(setCurrentPage(page))}

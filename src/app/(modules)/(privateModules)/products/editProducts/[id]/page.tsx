@@ -5,11 +5,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import Select from "react-select";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addProducts,
-  EditProducts,
-  getSingleProduct,
-} from "@/services/productService";
+import { EditProducts, getSingleProduct } from "@/services/productService";
 import { AppDispatch } from "@/redux/store";
 import { productValidationSchema } from "@/utils/validation/productValidation";
 import { useParams, useRouter } from "next/navigation";
@@ -108,6 +104,19 @@ const EditProduct = () => {
 
     resetForm();
     setPreviews([]);
+  };
+
+  const handleRemoveImage = (
+    index: number,
+    setFieldValue: (field: string, value: any) => void,
+    values: ProductsFormValues
+  ) => {
+    const updatedPreviews = previews.filter((_, i) => i !== index);
+    setPreviews(updatedPreviews);
+    setFieldValue(
+      "images",
+      values.images.filter((_, i) => i !== index)
+    );
   };
 
   return (
@@ -283,7 +292,7 @@ const EditProduct = () => {
                     {previews.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {previews.map((preview, index) => (
-                          <div key={index} className="relative w-32 h-32">
+                          <div key={preview} className="relative w-32 h-32">
                             <Image
                               src={preview}
                               alt={`Preview ${index}`}
@@ -293,19 +302,12 @@ const EditProduct = () => {
                             />
                             <button
                               type="button"
-                              onClick={() => {
-                                const updatedPreviews = previews.filter(
-                                  (_, i) => i !== index
-                                );
-                                setPreviews(updatedPreviews);
-                                setFieldValue(
-                                  "images",
-                                  values.images.filter((_, i) => i !== index)
-                                );
-                              }}
-                              className="absolute top-1 right-1 text-red-600 bg-white rounded-full p-1 hover:bg-red-600 hover:text-white"
+                              onClick={() =>
+                                handleRemoveImage(index, setFieldValue, values)
+                              }
+                              className="absolute top-1 right-1 text-sm text-red-600 hover:text-red-700"
                             >
-                              <AiOutlineClose />
+                              <AiOutlineClose className="w-5 h-5" />
                             </button>
                           </div>
                         ))}

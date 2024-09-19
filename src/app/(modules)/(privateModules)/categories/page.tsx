@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEye, FaEdit } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import useDebounce from "@/hooks/useDebounce";
@@ -19,8 +18,8 @@ const Categories = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [sortorder, setSortOrder] = useState("asc");
-  const [sortcoloum, setsortColoum] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortColumn, setSortColumn] = useState("name");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { singleCategory } = useSelector((state: any) => state.root.categories);
 
@@ -29,8 +28,6 @@ const Categories = () => {
   const UserToken = User?.loginData?.token;
   const Token = SocialUserToken || UserToken;
 
-  console.log(singleCategory, "singleCategory");
-
   const dispatch: AppDispatch = useDispatch();
 
   const { categories, totalPages, loading } = useSelector(
@@ -38,8 +35,6 @@ const Categories = () => {
   );
 
   const { currentPage } = useSelector((state: any) => state.root.categories);
-
-  console.log(categories, totalPages, currentPage, loading, "categories");
 
   useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
@@ -54,12 +49,12 @@ const Categories = () => {
           page: currentPage,
           searchQuery: debouncedSearchQuery,
           token: Token,
-          sortorder: sortorder,
-          sortcoloum: sortcoloum,
+          sortorder: sortOrder,
+          sortcoloum: sortColumn,
         })
       );
     }
-  }, [currentPage, debouncedSearchQuery, sortcoloum, sortorder, dispatch]);
+  }, [currentPage, debouncedSearchQuery, sortColumn, sortOrder, dispatch]);
 
   const deletePopUp = async (id: string) => {
     const result = await Swal.fire({
@@ -91,8 +86,8 @@ const Categories = () => {
               page: 1,
               searchQuery: debouncedSearchQuery,
               token: Token,
-              sortorder: sortorder,
-              sortcoloum: sortcoloum,
+              sortorder: sortOrder,
+              sortcoloum: sortColumn,
             })
           );
         } else {
@@ -114,15 +109,14 @@ const Categories = () => {
 
   //handel sort
   const handleSort = (columnKey: string) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortcoloum && sortcoloum === columnKey && sortorder === "asc") {
-      direction = "desc";
+    if (sortColumn === columnKey && sortOrder === "asc") {
       setSortOrder("desc");
     } else {
       setSortOrder("asc");
     }
-    setsortColoum(columnKey);
+    setSortColumn(columnKey);
   };
+
   //coloum of table
   const columns = [
     { key: "name", label: "Name", type: "text" },
@@ -150,9 +144,9 @@ const Categories = () => {
         loading={loading}
         error={null}
         onDelete={deletePopUp}
-        onSort={handleSort} // Pass the sorting handler
-        sortcoloum={sortcoloum} // Pass the sorting config
-        sortorder={sortorder}
+        onSort={handleSort}
+        sortcoloum={sortColumn}
+        sortorder={sortOrder}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={(page) => dispatch(setCurrentPage(page))}
