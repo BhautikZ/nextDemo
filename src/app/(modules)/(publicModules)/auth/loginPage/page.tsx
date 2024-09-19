@@ -69,7 +69,7 @@ function Login() {
 
       dispatch(SocialLoginUser(data));
       localStorage.setItem("userSession", JSON.stringify(session));
-      router.push("/userDashboard");
+      router.push("/home");
     }
   }, [session]);
 
