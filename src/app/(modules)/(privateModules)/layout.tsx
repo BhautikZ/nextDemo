@@ -13,8 +13,11 @@ import dashboardIcon from "../../../../public/assets/dashboardIcon.svg";
 import { resetData } from "@/redux/slice/userSlice";
 import { resetProductData } from "@/redux/slice/productSlice";
 import { resetCategoryData } from "@/redux/slice/categorySlice";
+interface DefaultLayoutProps {
+  readonly children: React.ReactNode;
+}
 
-function DefaultLayout({ children }: { children: React.ReactNode }) {
+function DefaultLayout({ children }: DefaultLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const isMounted = useIsMounted();
@@ -130,55 +133,56 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 p-6 bg-gray-100 h-full overflow-y-auto">
         <div className="flex justify-end items-center">
-          {
-            <div className="relative">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => setDropdownOpen(!isDropdownOpen)}
-              >
-                <img
-                  src={
-                    session && session.user?.image
-                      ? (session.user?.image as string)
-                      : defaultImage.src
-                  }
-                  alt="User Image"
-                  className="w-8 h-8 rounded-full mr-2"
-                />
-                <div className="flex flex-col text-gray-800">
-                  {/* Display the user's name */}
-                  <span className="font-medium">
-                    {session ? session.user?.name : UserData?.user?.name}
-                  </span>
-                  {/* Display the role under the name */}
-                  <span className="text-sm text-gray-500">
-                    {Role
-                      ? Role.charAt(0).toUpperCase() + Role.slice(1)
-                      : "Guest"}
-                  </span>
-                </div>
+          <div className="relative">
+            <button
+              className="flex items-center cursor-pointer bg-transparent border-none p-0"
+              onClick={() => setDropdownOpen(!isDropdownOpen)}
+              aria-expanded={isDropdownOpen}
+              aria-controls="dropdown-menu"
+            >
+              <img
+                src={session?.user?.image ?? defaultImage.src}
+                alt={
+                  session?.user?.name
+                    ? `${session.user.name}'s profile picture`
+                    : "Default profile picture"
+                }
+                className="w-8 h-8 rounded-full mr-2"
+              />
+              <div className="flex flex-col text-gray-800">
+                <span className="font-medium">
+                  {session?.user?.name ?? UserData?.user?.name}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {Role
+                    ? Role.charAt(0).toUpperCase() + Role.slice(1)
+                    : "Guest"}
+                </span>
               </div>
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
-                  <button
-                    onClick={() => {
-                      router.push("/profile");
-                      setDropdownOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Profile
-                  </button>
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          }
+            </button>
+            {isDropdownOpen && (
+              <div
+                id="dropdown-menu"
+                className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2"
+              >
+                <button
+                  onClick={() => {
+                    router.push("/profile");
+                    setDropdownOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                >
+                  Profile
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         {children}
       </main>

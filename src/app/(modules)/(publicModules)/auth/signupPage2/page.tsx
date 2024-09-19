@@ -8,7 +8,6 @@ import { useDispatch } from "react-redux";
 import { signInUser } from "@/services/authService";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 import { AiOutlineClose, AiOutlineCloudUpload } from "react-icons/ai";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupValidationSchema } from "../../../../../utils/validation/signUpValidation";
 import { AppDispatch } from "@/redux/store";

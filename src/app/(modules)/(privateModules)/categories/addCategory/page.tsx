@@ -11,7 +11,7 @@ import { categoryValidationSchema } from "@/utils/validation/categoryValidation"
 interface CategoryFormValues {
   name: string;
   description: string;
-  isActive: string; // Store as string ("true" or "false")
+  isActive: string;
 }
 
 const AddCategory = () => {
@@ -21,7 +21,7 @@ const AddCategory = () => {
   const initialValues: CategoryFormValues = {
     name: "",
     description: "",
-    isActive: "true", // Default to "true" (string)
+    isActive: "true",
   };
 
   const onSubmit = async (
@@ -31,7 +31,7 @@ const AddCategory = () => {
     const formData = {
       name: values.name,
       description: values.description,
-      isActive: values.isActive === "true", // Convert string back to boolean
+      isActive: values.isActive === "true",
     };
 
     try {

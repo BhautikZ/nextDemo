@@ -51,7 +51,7 @@ const AddProduct = () => {
   };
 
   useEffect(() => {
-    dispatch(GetAllCategories({token :Token}));
+    dispatch(GetAllCategories({ token: Token }));
   }, []);
 
   const onSubmit = async (
@@ -78,6 +78,19 @@ const AddProduct = () => {
 
     resetForm();
     setPreviews([]);
+  };
+
+  const handleRemoveImage = (
+    index: number,
+    setFieldValue: (field: string, value: any) => void,
+    values: ProductsFormValues
+  ) => {
+    const updatedPreviews = previews.filter((_, i) => i !== index);
+    setPreviews(updatedPreviews);
+    setFieldValue(
+      "images",
+      values.images.filter((_, i) => i !== index)
+    );
   };
 
   return (
@@ -247,7 +260,7 @@ const AddProduct = () => {
                   </button>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {previews.map((preview, index) => (
-                      <div key={index} className="relative w-32 h-32">
+                      <div key={preview} className="relative w-32 h-32">
                         <Image
                           src={preview}
                           alt={`Preview ${index}`}
@@ -257,16 +270,9 @@ const AddProduct = () => {
                         />
                         <button
                           type="button"
-                          onClick={() => {
-                            const updatedPreviews = previews.filter(
-                              (_, i) => i !== index
-                            );
-                            setPreviews(updatedPreviews);
-                            setFieldValue(
-                              "images",
-                              values.images.filter((_, i) => i !== index)
-                            );
-                          }}
+                          onClick={() =>
+                            handleRemoveImage(index, setFieldValue, values)
+                          }
                           className="absolute top-1 right-1 text-sm text-red-600 hover:text-red-700"
                         >
                           <AiOutlineClose className="w-5 h-5" />

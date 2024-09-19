@@ -3,15 +3,13 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
 import { LoginUser, SocialLoginUser } from "@/services/authService";
 import { AppDispatch } from "@/redux/store";
-import { logout } from "@/redux/slice/authSlice";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import {
-  FaApple,
   FaFacebook,
   FaGithub,
   FaGoogle,
@@ -19,10 +17,9 @@ import {
   FaTwitter,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import withAuthPublic from "@/components/AuthGuard/Auth-wrapper-public";
 import Spinner from "@/components/Spinner";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import CustomInput from "@/components/CustomeInput";
 import PasswordInput from "@/components/CustomePasswordInput";
 
@@ -46,11 +43,6 @@ function Login() {
   const { loading } = useSelector((state: any) => state.root.signIn);
   const router = useRouter();
   const { data: session } = useSession();
-  const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   // Form setup with react-hook-form and Yup validation
   const {
@@ -180,12 +172,6 @@ function Login() {
             onClick={() => signIn("linkedin")}
           >
             <FaLinkedin size={24} />
-          </button>
-          <button
-            className="p-2 rounded-full border border-gray-300"
-            onClick={() => signIn("apple")}
-          >
-            <FaApple size={24} />
           </button>
         </div>
       </div>

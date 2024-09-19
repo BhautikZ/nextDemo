@@ -69,7 +69,6 @@ const Signup = () => {
     formData.append("gender", values.gender);
     formData.append("terms", values.terms.toString());
     formData.append("skills", JSON.stringify(skillValues));
-    // formData.append("role", "admin");
 
     values.images.forEach((image) => {
       formData.append("profile_image", image);
@@ -212,7 +211,10 @@ const Signup = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Gender
                   </label>
                   <div className="mt-2 space-y-2">
